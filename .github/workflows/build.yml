@@ -9,7 +9,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu make
-        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src || true
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd) || true
+        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
         ls -la
         
