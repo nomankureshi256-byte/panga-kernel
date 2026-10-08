@@ -17,4 +17,9 @@ jobs:
       - name: Compile Module
         run: |
           make
-          
+
+      - name: Upload Kernel Module
+        uses: actions/upload-artifact@v3
+        with:
+          name: panga-kernel-module
+          path: *.ko
