@@ -1,4 +1,4 @@
-name: Build ARM64 Kernel Module
+name: Build Realme 6 Pro Kernel Module
 
 on: [push, pull_request]
 
@@ -7,20 +7,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Setup Toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu make
-    - name: Download Kernel Headers
+        sudo apt-get install -y gcc-aarch64-linux-gnu make git
+
+    - name: Clone Realme 6 Pro Kernel Source
       run: |
-        # Minimal headers package ya clean clone alternative
-        git clone --depth=1 https://github.com/akhilnarang/kernel_workspace.git -b android-10 kernel_src || true
+        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
+
+    - name: Prepare Kernel Build Config
+      run: |
+        cd kernel_src
+        # Realme 6 Pro ke liye default config set kar rahe hain
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- vendor/ices_defconfig || make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+
     - name: Build Module
       run: |
-        if [ -d "kernel_src" ]; then
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
-        else
-          echo "Kernel source directory not found!"
-          exit 1
-        fi
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
+
+    - name: Upload Built Module
+      uses: actions/upload-artifact@v4
+      with:
+        name: panga-kernel-module
+        path: *.ko
         
