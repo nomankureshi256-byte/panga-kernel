@@ -4,22 +4,18 @@ on: [push]
 
 jobs:
   build:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout Repository
-       uses: actions/checkout@v3
+  
+    runs-on: ubuntu-latest
 
-     - name: Set up Environment
-       run: |
-         sudo apt-get update
-         sudo apt-get install -y build-essential linux-headers-generic
+    steps:
+    - uses: actions/checkout@v3
 
-     - name: Compile Module
-       run: |
-         make
+    - name: Set up Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential linux-headers-generic
 
-     - name: Upload Kernel Module
-       uses: actions/upload-artifact@v3
-       with:
-         name: panga-kernel-module
-         path: *.ko
+    - name: Compile Module
+      run: |
+        make
+        
