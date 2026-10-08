@@ -5,27 +5,14 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install ARM64 Toolchain
+    - uses: actions/checkout@v4
+    - name: Setup Toolchain
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu make git
-
-    - name: Clone Realme 6 Pro Kernel Source
-      run: |
-        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
-
-    - name: Build Kernel Module
-      run: |
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: panga-kernel-module
-        path: *.ko
-        
+    - name: Clone Kernel Source
+      run: git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
+    - name: Build Module
+      run: make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
+      
