@@ -10,17 +10,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu make bc bison flex libssl-dev
         
-        # Kernel ke basic build tools aur dummy structure ke liye direct Linux stable source ka minimal shallow clone use karte hain
-        git clone --depth=1 https://github.com/torvalds/linux.git kernel_src || true
+        # Android 4.14 stable source clone karte hain jo Realme 6 Pro se match kare
+        git clone --depth=1 https://android.googlesource.com/kernel/common -b android-4.14 kernel_src
         
-        if [ -d "kernel_src" ]; then
-          cd kernel_src
-          make ARCH=arm64 defconfig
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
-          cd ..
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
-        else
-          echo "Fallback building without full kernel source"
-        fi
-        ls -la
+        cd kernel_src
+        make ARCH=arm64 defconfig
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+        cd ..
+        
+        # Module build command
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
+        ls -la *.ko
         
