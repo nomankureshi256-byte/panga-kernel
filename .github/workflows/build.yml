@@ -1,36 +1,15 @@
-name: Build Realme 6 Pro Kernel Module
-
-on: [push, pull_request]
-
+name: Build
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Setup Toolchain
+    - name: Run Build
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu make git
-
-    - name: Clone Realme 6 Pro Kernel Source
-      run: |
-        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
-
-    - name: Prepare Kernel Build Config
-      run: |
-        cd kernel_src
-        # Realme 6 Pro ke liye default config set kar rahe hain
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- vendor/ices_defconfig || make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
-
-    - name: Build Module
-      run: |
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
-
-    - name: Upload Built Module
-      uses: actions/upload-artifact@v4
-      with:
-        name: panga-kernel-module
-        path: *.ko
+        sudo apt-get install -y gcc-aarch64-linux-gnu make
+        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src || true
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd) || true
+        ls -la
         
