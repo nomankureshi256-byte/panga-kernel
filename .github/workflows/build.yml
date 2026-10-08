@@ -1,4 +1,4 @@
-name: Build ARM64 Kernel Module
+name: Build ARM64 Kernel Module for Realme 6 Pro
 
 on: [push, pull_request]
 
@@ -13,9 +13,21 @@ jobs:
     - name: Install ARM64 Toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu make
+        sudo apt-get install -y gcc-aarch64-linux-gnu make git
+
+    - name: Clone Realme 6 Pro Kernel Source
+      run: |
+        # Realme 6 Pro (RealmeUI / Snapdragon 720G kernel source clone kar rahe hain)
+        git clone --depth=1 https://github.com/realme-kernel-opensource/realme6Pro-AndroidQ-Kernel.git kernel_src
 
     - name: Build Kernel Module
       run: |
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /path/to/kernel/headers M=$(pwd)
+        # Yahan hum source path set karke module compile kar rahe hain
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C kernel_src M=$(pwd)
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: panga-kernel-module
+        path: *.ko
         
