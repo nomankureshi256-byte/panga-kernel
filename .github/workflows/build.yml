@@ -9,8 +9,11 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu make linux-headers-generic
-        
-        # Current directory ko hi source maan kar simple compile test karte hain
         make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /lib/modules/$(uname -r)/build M=$(pwd) || make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- M=$(pwd) || echo "Build attempted"
         ls -la
+    - name: Upload Module Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: panga-kernel-module
+        path: *.ko
         
