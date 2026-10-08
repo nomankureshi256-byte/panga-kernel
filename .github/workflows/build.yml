@@ -4,16 +4,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Run Build
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu make linux-headers-generic
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /lib/modules/$(uname -r)/build M=$(pwd) || make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- M=$(pwd) || echo "Build attempted"
-        ls -la
-    - name: Upload Module Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: panga-kernel-module
-        path: *.ko
-        
+      - uses: actions/checkout@v4
+      - name: Run Build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu make linux-headers-generic
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /lib/modules/$(uname -r)/build M=$(pwd) || make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- M=$(pwd) || echo "Build attempted"
+          ls -la
+      - name: Upload Module Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: panga-kernel-module
+          path: '*.ko'
+          
