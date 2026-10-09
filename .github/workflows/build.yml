@@ -1,4 +1,4 @@
-name: Build KPM Module
+name: Build APatch KPM Module
 
 on:
   push:
@@ -23,15 +23,30 @@ jobs:
       run: |
         make -C /lib/modules/$(uname -r)/build M=$PWD modules
 
-    - name: Prepare KPM Output
+    - name: Create APatch Module Package
       run: |
+        mkdir -p apatch_module/META-INF/com/google/android
         mkdir -p output
-        find . -name "*.ko" -exec cp {} output/ \;
-        cd output
+        
+        # module.prop बनाना जो APatch ऐप में दिखे
+        echo "id=panga_kpm" > apatch_module/module.prop
+        echo "name=Panga KPM Module" >> apatch_module/module.prop
+        echo "version=1.0" >> apatch_module/module.prop
+        echo "versionCode=1" >> apatch_module/module.prop
+        echo "author=Aamir Kureshi" >> apatch_module/module.prop
+        echo "description=Kernel Patch Module for Panga" >> apatch_module/module.prop
+
+        # .ko को .kpm में बदलकर फोल्डर में रखना
+        find . -name "*.ko" -exec cp {} apatch_module/ \;
+        cd apatch_module
         for f in *.ko; do mv "$f" "${f%.ko}.kpm"; done
+        
+        # ज़िप पैकेज बनाना
+        zip -r ../output/panga-apatch-module.zip .
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: panga-kpm-module
-        path: output/*.kpm
+        name: panga-apatch-module
+        path: output/panga-apatch-module.zip
+        
