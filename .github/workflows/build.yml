@@ -1,19 +1,37 @@
-name: Build
-on: [push]
+name: Build KPM Module
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
 jobs:
   build:
-  
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Run Build
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu make
-          make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
-      - name: Upload Module Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: panga-kernel-node
-          path: "*.ko"
-          
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libelf-dev bc bison flex libssl-dev
+
+    - name: Compile Module
+      run: |
+        make -C /lib/modules/$(uname -r)/build M=$PWD modules
+
+    - name: Prepare KPM Output
+      run: |
+        mkdir -p output
+        find . -name "*.ko" -exec cp {} output/ \;
+        cd output
+        for f in *.ko; do mv "$f" "${f%.ko}.kpm"; done
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: panga-kpm-module
+        path: output/*.kpm
