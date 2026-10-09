@@ -1,4 +1,4 @@
-name: Build APatch KPM Module
+name: Build APatch KPM
 
 on:
   push:
@@ -19,34 +19,34 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential libelf-dev bc bison flex libssl-dev
 
-    - name: Compile Module
+    - name: Compile Kernel Module
       run: |
         make -C /lib/modules/$(uname -r)/build M=$PWD modules
 
-    - name: Create APatch Module Package
+    - name: Package for APatch
       run: |
-        mkdir -p apatch_module/META-INF/com/google/android
+        mkdir -p package/META-INF/com/google/android
         mkdir -p output
         
-        # module.prop बनाना जो APatch ऐप में दिखे
-        echo "id=panga_kpm" > apatch_module/module.prop
-        echo "name=Panga KPM Module" >> apatch_module/module.prop
-        echo "version=1.0" >> apatch_module/module.prop
-        echo "versionCode=1" >> apatch_module/module.prop
-        echo "author=Aamir Kureshi" >> apatch_module/module.prop
-        echo "description=Kernel Patch Module for Panga" >> apatch_module/module.prop
+        # आवश्यक module.prop बनाना
+        echo "id=panga_kpm" > package/module.prop
+        echo "name=Panga KPM" >> package/module.prop
+        echo "version=1.0" >> package/module.prop
+        echo "versionCode=1" >> package/module.prop
+        echo "author=Panga" >> package/module.prop
+        echo "description=Custom KPM for Realme 6 Pro" >> package/module.prop
 
-        # .ko को .kpm में बदलकर फोल्डर में रखना
-        find . -name "*.ko" -exec cp {} apatch_module/ \;
-        cd apatch_module
+        # .ko को .kpm में बदलना और पैकेज फोल्डर में डालना
+        find . -name "*.ko" -exec cp {} package/ \;
+        cd package
         for f in *.ko; do mv "$f" "${f%.ko}.kpm"; done
         
-        # ज़िप पैकेज बनाना
-        zip -r ../output/panga-apatch-module.zip .
+        # अंत में सही APatch ज़िप तैयार करना
+        zip -r ../output/panga-fixed-module.zip .
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: panga-apatch-module
-        path: output/panga-apatch-module.zip
+        name: panga-fixed-module
+        path: output/panga-fixed-module.zip
         
